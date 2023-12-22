@@ -1,0 +1,6 @@
+__pycache__
+*.pyc
+humanoid_league_speaker/cfg/cpp/
+humanoid_league_speaker/src/humanoid_league_speaker/cfg/
+.vscode
+```
