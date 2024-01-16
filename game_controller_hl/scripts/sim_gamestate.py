@@ -13,8 +13,9 @@ import tty
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, DurabilityPolicy
-from bitbots_msgs.msg import GameState as GameStateMsg
-from bitbots_utils.utils import get_parameters_from_other_node
+
+from game_controller_hl_interfaces.msg import GameState
+from game_controller_hl.utils import get_parameters_from_other_node
 
 
 class SimGamestate(Node):
@@ -57,19 +58,25 @@ CTRL-C to quit
         super().__init__("sim_gamestate")
         self.logger = self.get_logger()
 
-        self.team_id = get_parameters_from_other_node(self, "parameter_blackboard", ["team_id"])["team_id"]
+        # Try fetching team id from parameter blackboard or ask user for input
+        try:
+            self.team_id = get_parameters_from_other_node(self, "parameter_blackboard", ["team_id"])["team_id"]
+        except KeyError:
+            self.logger.error("No team id found in parameter blackboard")
+            self.team_id = int(input("Please enter team id: "))
+
         self.has_kick_off = True
 
         self.settings = termios.tcgetattr(sys.stdin)
 
         self.publisher = self.create_publisher(
-            GameStateMsg,
+            GameState,
             "gamestate",
             QoSProfile(durability=DurabilityPolicy.TRANSIENT_LOCAL, depth=1),
         )
 
     def loop(self):
-        game_state_msg = GameStateMsg()
+        game_state_msg = GameState()
         game_state_msg.header.stamp = self.get_clock().now().to_msg()
 
         # Init secondary state team to our teamID
