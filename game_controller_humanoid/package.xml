@@ -14,22 +14,17 @@
 
   <author email="7engelke@informatik.uni-hamburg.de">Timon Engelke</author>
 
-  <license>MIT</license>
+  <license>Apache License 2.0</license>
 
   <buildtool_depend>rosidl_default_generators</buildtool_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>
 
-  <depend>bitbots_docs</depend>
-  <depend>bitbots_msgs</depend>
+  <depend>game_controller_humanoid_interfaces</depend>
   <depend>python3-construct</depend>
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
 
   <export>
     <build_type>ament_python</build_type>
-    <bitbots_documentation>
-      <status>tested_integration</status>
-      <language>python</language>
-    </bitbots_documentation>
   </export>
 </package>

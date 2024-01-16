@@ -5,7 +5,7 @@ from construct import Byte, Struct, Enum, Bytes, Const, Array, Int16ul, PaddedSt
 
 Short = Int16ul
 
-RobotInfo = "robot_info" / Struct(
+RobotInfoStruct = "robot_info" / Struct(
     # define NONE                        0
     # define PENALTY_HL_KID_BALL_MANIPULATION    1
     # define PENALTY_HL_KID_PHYSICAL_CONTACT     2
@@ -23,7 +23,7 @@ RobotInfo = "robot_info" / Struct(
     "goalkeeper" / Flag
 )
 
-TeamInfo = "team" / Struct(
+TeamInfoStruct = "team" / Struct(
     "team_number" / Byte,
     "team_color" / Enum(Byte,
                         BLUE=0,
@@ -42,11 +42,11 @@ TeamInfo = "team" / Struct(
     "single_shots" / Short,  # bits represent penalty shot success
     "coach_sequence" / Byte,
     "coach_message" / PaddedString(253, 'utf8'),
-    "coach" / RobotInfo,
-    "players" / Array(11, RobotInfo)
+    "coach" / RobotInfoStruct,
+    "players" / Array(11, RobotInfoStruct)
 )
 
-GameState = "gamedata" / Struct(
+GameStateStruct = "gamedata" / Struct(
     "header" / Const(b'RGme'),
     "version" / Const(12, Short),
     "packet_number" / Byte,
@@ -84,14 +84,14 @@ GameState = "gamedata" / Struct(
     "drop_in_time" / Short,
     "seconds_remaining" / Int16sl,
     "secondary_seconds_remaining" / Int16sl,
-    "teams" / Array(2, "team" / TeamInfo)
+    "teams" / Array(2, "team" / TeamInfoStruct)
 )
 
 GAME_CONTROLLER_RESPONSE_VERSION = 2
 
-ReturnData = Struct(
+ResponseStruct = Struct(
     "header" / Const(b"RGrt"),
-    "version" / Const(2, Byte),
+    "version" / Const(GAME_CONTROLLER_RESPONSE_VERSION, Byte),
     "team" / Byte,
     "player" / Byte,
     "message" / Byte

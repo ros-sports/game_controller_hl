@@ -1,7 +1,6 @@
 import glob
 
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
 
 package_name = 'game_controller_humanoid'
 
@@ -26,6 +25,7 @@ setup(
     zip_safe=True,
     keywords=['ROS'],
     license='MIT',
+    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'game_controller = game_controller_humanoid.receiver:main',
