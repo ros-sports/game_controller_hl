@@ -1,7 +1,7 @@
 ---
 # Game controller network settings
 
-game_controller_humanoid:
+game_controller_hl:
   ros__parameters:
     listen_host: '0.0.0.0'
     listen_port: 3838

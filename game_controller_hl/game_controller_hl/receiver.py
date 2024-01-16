@@ -22,10 +22,10 @@ from rclpy.time import Time
 from rclpy.duration import Duration
 from std_msgs.msg import Header
 from construct import Container
-from game_controller_humanoid.gamestate import GameStateStruct, ResponseStruct
-from game_controller_humanoid.utils import get_parameters_from_other_node
+from game_controller_hl.gamestate import GameStateStruct, ResponseStruct
+from game_controller_hl.utils import get_parameters_from_other_node
 
-from game_controller_humanoid_interfaces.msg import GameState
+from game_controller_hl_interfaces.msg import GameState
 
 
 class GameStateReceiver(Node):

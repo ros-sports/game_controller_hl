@@ -6,11 +6,11 @@ from construct import Container, ListContainer, EnumIntegerString
 from rclpy.node import Node
 from rclpy.parameter import Parameter
 
-from game_controller_humanoid.gamestate import GameStateStruct, TeamInfoStruct
-from game_controller_humanoid.utils import get_parameters_from_other_node
-from game_controller_humanoid.receiver import GameStateReceiver
+from game_controller_hl.gamestate import GameStateStruct, TeamInfoStruct
+from game_controller_hl.utils import get_parameters_from_other_node
+from game_controller_hl.receiver import GameStateReceiver
 
-from game_controller_humanoid_interfaces.msg import GameState
+from game_controller_hl_interfaces.msg import GameState
 
 
 def test_get_parameters_from_other_node():

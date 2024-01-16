@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>game_controller_humanoid</name>
+  <name>game_controller_hl</name>
   <version>1.1.0</version>
   <description>
-      The game_controller_humanoid packages receives packets from the GameController and
-      republishes them as bitbots_msgs/GameState ROS messages. It sends response packets
+      The game_controller_hl packages receives packets from the GameController and
+      republishes them as GameState ROS messages. It sends response packets
       back to the GameController.
   </description>
 
@@ -19,7 +19,7 @@
   <buildtool_depend>rosidl_default_generators</buildtool_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>
 
-  <depend>game_controller_humanoid_interfaces</depend>
+  <depend>game_controller_hl_interfaces</depend>
   <depend>python3-construct</depend>
   <depend>rclpy</depend>
   <depend>std_msgs</depend>

@@ -2,7 +2,7 @@ import glob
 
 from setuptools import find_packages, setup
 
-package_name = 'game_controller_humanoid'
+package_name = 'game_controller_hl'
 
 setup(
     name=package_name,
@@ -28,7 +28,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'game_controller = game_controller_humanoid.receiver:main',
+            'game_controller = game_controller_hl.receiver:main',
         ],
     }
 )

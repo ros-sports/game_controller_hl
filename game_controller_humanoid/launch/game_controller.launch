@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<launch>
-    <arg name="sim" default="false" />
-
-    <node pkg="game_controller_humanoid" exec="game_controller" name="game_controller_humanoid" output="screen">
-        <param from="$(find-pkg-share game_controller_humanoid)/config/game_controller_settings.yaml" />
-        <param name="use_sim_time" value="$(var sim)" />
-    </node>
-</launch>
