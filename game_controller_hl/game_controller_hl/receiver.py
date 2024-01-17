@@ -84,10 +84,11 @@ class GameStateReceiver(Node):
 
     def _open_socket(self) -> socket.socket:
         """ Creates the socket """
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket.bind(self.addr)
-        self.socket.settimeout(2)
+        new_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        new_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        new_socket.bind(self.addr)
+        new_socket.settimeout(2)
+        return new_socket
 
     def receive_forever(self):
         """ Waits in a loop for new packages """
@@ -119,7 +120,7 @@ class GameStateReceiver(Node):
             self.answer_to_gamecontroller(peer)
 
         except AssertionError as ae:
-            self.get_logger().error(ae)
+            self.get_logger().error(str(ae))
         except socket.timeout:
             self.get_logger().info("No GameController message received (socket timeout)", throttle_duration_sec=5)
         except ConstError:
