@@ -12,9 +12,9 @@
   <maintainer email="7engelke@informatik.uni-hamburg.de">Timon Engelke</maintainer>
   <maintainer email="info@bit-bots.de">Hamburg Bit-Bots</maintainer>
 
-  <author email="7engelke@informatik.uni-hamburg.de">Timon Engelke</author>
-
   <license>Apache License 2.0</license>
+
+  <author email="7engelke@informatik.uni-hamburg.de">Timon Engelke</author>
 
   <buildtool_depend>rosidl_default_generators</buildtool_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>
