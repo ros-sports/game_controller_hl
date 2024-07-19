@@ -153,8 +153,6 @@ class GameStateReceiver(Node):
             diag.message = "Connected"
             diag.level = DiagnosticStatus.OK 
 
-        self.get_logger().warn(str(diag)) 
-
         diag_array.status.append(diag)    
     
         #add timestamp to header and publish DiagnosticArray
