@@ -22,6 +22,7 @@ from rclpy.time import Time
 from rclpy.duration import Duration
 from std_msgs.msg import Header
 from construct import Container
+from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
 from game_controller_hl.gamestate import GameStateStruct, ResponseStruct
 from game_controller_hl.utils import get_parameters_from_other_node
 
@@ -65,9 +66,12 @@ class GameStateReceiver(Node):
         # The publisher for the game state
         self.state_publisher = self.create_publisher(GameState, 'gamestate', 1)
 
+        #The publisher for the diagnostics
+        self.diagnostic_pub = self.create_publisher(DiagnosticArray, "diagnostics", 1)
+
         # The time in seconds after which we assume the game controller is lost 
         # and we tell the robot to move
-        self.game_controller_lost_time = 20
+        self.game_controller_lost_time = 5
 
         # The address listening on and the port for sending back the robots meta data
         self.addr = (
@@ -98,7 +102,10 @@ class GameStateReceiver(Node):
             # Check if we didn't receive a package for a long time and if so
             # call the fallback behavior
             if self.get_time_since_last_package() > Duration(seconds=self.game_controller_lost_time):
-                self.fallback_behavior()
+                self.publish_diagnostics(False)
+            else:
+                self.publish_diagnostics(True)
+
 
     def receive_and_answer_once(self):
         """ Receives a package, interprets it and sends an answer. """
@@ -128,18 +135,32 @@ class GameStateReceiver(Node):
         except IOError as e:
                 self.get_logger().warn(f"Error while sending keep-alive: {str(e)}")
 
-    def fallback_behavior(self):
+    def publish_diagnostics(self, received_message_lately: bool):
         """ 
-        This is called if we didn't receive a package for a long time.
-        It tells the robot to play anyway.
+        This publishes a Diagnostics Array.
         """
-        self.get_logger().info("No GameController message received, allowing robot to move anyway", throttle_duration_sec=5)
-        self.state_publisher.publish(
-            GameState(
-                header=Header(stamp=self.get_clock().now().to_msg()),
-                game_state = GameState.GAMESTATE_PLAYING
-            )
-        )
+        self.get_logger().info("No GameController message received", throttle_duration_sec=5)
+
+        #initialize DiagnsticArray message
+        diag_array = DiagnosticArray()
+
+        #configure DiagnosticStatus message
+        diag = DiagnosticStatus(name = "Game Controller", hardware_id = "Game Controller" )
+        if not received_message_lately:
+            diag.message = "Lost connection to game controller for " + str(int(self.get_time_since_last_package().nanoseconds/1e9)) + " sec"
+            diag.level = DiagnosticStatus.WARN
+        else:
+            diag.message = "Connected"
+            diag.level = DiagnosticStatus.OK 
+
+        self.get_logger().warn(str(diag)) 
+
+        diag_array.status.append(diag)    
+    
+        #add timestamp to header and publish DiagnosticArray
+        diag_array.header.stamp = self.get_clock().now().to_msg()
+        self.diagnostic_pub.publish(diag_array)
+
 
     def answer_to_gamecontroller(self, peer):
         """ Sends a life sign to the game controller """

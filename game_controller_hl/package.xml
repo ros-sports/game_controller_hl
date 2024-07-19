@@ -19,6 +19,7 @@
   <buildtool_depend>rosidl_default_generators</buildtool_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>
 
+  <depend>diagnostic_msgs</depend>
   <depend>game_controller_hl_interfaces</depend>
   <depend>python3-construct</depend>
   <depend>rclpy</depend>
