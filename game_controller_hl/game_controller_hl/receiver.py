@@ -55,7 +55,7 @@ class GameStateReceiver(Node):
             bot_id_param_name: str = self.get_parameter('bot_id_param_name').value
             # Get the parameters from the blackboard
             params = get_parameters_from_other_node(self, param_blackboard_name, [
-                team_id_param_name, 
+                team_id_param_name,
                 bot_id_param_name])
             # Set the parameters
             self.team_number = params[team_id_param_name]
@@ -69,13 +69,13 @@ class GameStateReceiver(Node):
         #The publisher for the diagnostics
         self.diagnostic_pub = self.create_publisher(DiagnosticArray, "diagnostics", 1)
 
-        # The time in seconds after which we assume the game controller is lost 
+        # The time in seconds after which we assume the game controller is lost
         # and we tell the robot to move
         self.game_controller_lost_time = 5
 
         # The address listening on and the port for sending back the robots meta data
         self.addr = (
-            self.get_parameter('listen_host').value, 
+            self.get_parameter('listen_host').value,
             self.get_parameter('listen_port').value
         )
         self.answer_port = self.get_parameter('answer_port').value
@@ -99,18 +99,15 @@ class GameStateReceiver(Node):
         while rclpy.ok():
             # Try to receive a package
             self.receive_and_answer_once()
-            # Check if we didn't receive a package for a long time and if so
-            # call the fallback behavior
-            if self.get_time_since_last_package() > Duration(seconds=self.game_controller_lost_time):
-                self.publish_diagnostics(False)
-            else:
-                self.publish_diagnostics(True)
+            # Check if we didn't receive a package for a long time for publishing diagnostics
+            received_message_lately = self.get_time_since_last_package() < Duration(seconds=self.game_controller_lost_time)
+            self.publish_diagnostics(received_message_lately)
 
 
     def receive_and_answer_once(self):
         """ Receives a package, interprets it and sends an answer. """
         try:
-            # Receive the package 
+            # Receive the package
             data, peer = self.socket.recvfrom(GameStateStruct.sizeof())
 
             # Parse the package based on the GameStateStruct
@@ -136,26 +133,25 @@ class GameStateReceiver(Node):
                 self.get_logger().warn(f"Error while sending keep-alive: {str(e)}")
 
     def publish_diagnostics(self, received_message_lately: bool):
-        """ 
+        """
         This publishes a Diagnostics Array.
         """
-        self.get_logger().info("No GameController message received", throttle_duration_sec=5)
-
-        #initialize DiagnsticArray message
+        # initialize DiagnsticArray message
         diag_array = DiagnosticArray()
 
-        #configure DiagnosticStatus message
-        diag = DiagnosticStatus(name = "Game Controller", hardware_id = "Game Controller" )
+        # configure DiagnosticStatus message
+        diag = DiagnosticStatus(name = "Game Controller", hardware_id = "Game Controller")
         if not received_message_lately:
-            diag.message = "Lost connection to game controller for " + str(int(self.get_time_since_last_package().nanoseconds/1e9)) + " sec"
+            self.get_logger().info("No GameController message received", throttle_duration_sec=5)
+            diag.message = "Lost connection to game controller for " + str(int(self.get_time_since_last_package().nanoseconds / 1e9)) + " sec"
             diag.level = DiagnosticStatus.WARN
         else:
             diag.message = "Connected"
-            diag.level = DiagnosticStatus.OK 
+            diag.level = DiagnosticStatus.OK
 
-        diag_array.status.append(diag)    
-    
-        #add timestamp to header and publish DiagnosticArray
+        diag_array.status.append(diag)
+
+        # add timestamp to header and publish DiagnosticArray
         diag_array.header.stamp = self.get_clock().now().to_msg()
         self.diagnostic_pub.publish(diag_array)
 
@@ -176,22 +172,22 @@ class GameStateReceiver(Node):
 
     def build_game_state_msg(self, state) -> GameState:
         """ Builds a GameState message from the game state """
-        
+
         # Get the team objects sorted into own and rival team
         own_team = GameStateReceiver.select_team_by(
-            lambda team: team.team_number == self.team_number, 
+            lambda team: team.team_number == self.team_number,
             state.teams)
         rival_team = GameStateReceiver.select_team_by(
-            lambda team: team.team_number != self.team_number, 
+            lambda team: team.team_number != self.team_number,
             state.teams)
 
         # Add some assertions to make sure everything is fine
         assert not (own_team is None or rival_team is None), \
             f'Team {self.team_number} not playing, only {state.teams[0].team_number} and {state.teams[1].team_number}'
-        
+
         assert self.player_number <= len(own_team.players), \
             f'Robot {self.player_number} not playing'
-        
+
         this_robot = own_team.players[self.player_number - 1]
 
         return GameState(
