@@ -99,12 +99,9 @@ class GameStateReceiver(Node):
         while rclpy.ok():
             # Try to receive a package
             self.receive_and_answer_once()
-            # Check if we didn't receive a package for a long time and if so
-            # call the fallback behavior
-            if self.get_time_since_last_package() > Duration(seconds=self.game_controller_lost_time):
-                self.publish_diagnostics(False)
-            else:
-                self.publish_diagnostics(True)
+            # Check if we didn't receive a package for a long time for publishing diagnostics
+            received_message_lately = self.get_time_since_last_package() < Duration(seconds=self.game_controller_lost_time)
+            self.publish_diagnostics(received_message_lately)
 
 
     def receive_and_answer_once(self):
@@ -139,14 +136,13 @@ class GameStateReceiver(Node):
         """
         This publishes a Diagnostics Array.
         """
-        self.get_logger().info("No GameController message received", throttle_duration_sec=5)
-
         # initialize DiagnsticArray message
         diag_array = DiagnosticArray()
 
         # configure DiagnosticStatus message
         diag = DiagnosticStatus(name = "Game Controller", hardware_id = "Game Controller")
         if not received_message_lately:
+            self.get_logger().info("No GameController message received", throttle_duration_sec=5)
             diag.message = "Lost connection to game controller for " + str(int(self.get_time_since_last_package().nanoseconds / 1e9)) + " sec"
             diag.level = DiagnosticStatus.WARN
         else:
